@@ -5717,7 +5717,7 @@ function startgameee() {
         keyboardDown(e) {
           switch (e.keyCode) {
             // ========================================================================
-            // Key "H". Text input for in-game chat. Does not freeze the game.
+            // Key "K". Text input for in-game chat. Does not freeze the game.
             case 72:
               var global = a;
               if (!global.died) {
@@ -5729,7 +5729,7 @@ function startgameee() {
                   chatInput.style.font = "bold 18px Ubuntu";
                   chatInput.maxlength = "100";
                   chatInput.placeholder =
-                    "Type Your Messages here! Keep it short. Esc To Cancel.";
+                    "Enter your Message here, press Esc to Cancel.";
 
                   // Chat input wrapper div.
                   let chatInputWrapper = document.createElement("div");
