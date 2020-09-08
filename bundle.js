@@ -5717,7 +5717,7 @@ function startgameee() {
         keyboardDown(e) {
           switch (e.keyCode) {
             // ========================================================================
-            // Key "K". Text input for in-game chat. Does not freeze the game.
+            // Key "H". Text input for in-game chat. Does not freeze the game.
             case 72:
               var global = a;
               if (!global.died) {
@@ -5729,7 +5729,7 @@ function startgameee() {
                   chatInput.style.font = "bold 18px Ubuntu";
                   chatInput.maxlength = "100";
                   chatInput.placeholder =
-                    "Enter your Message here, press Esc to Cancel.";
+                    "Enter your message | Press Esc to Cancel.";
 
                   // Chat input wrapper div.
                   let chatInputWrapper = document.createElement("div");
@@ -5972,6 +5972,800 @@ function startgameee() {
                       this.videoRecorder = new MediaRecorder(
                         this.cv.captureStream(60)
                       );
+                      this.videoRecorder.ondataavailable = a => e.push(a.data);
+                      this.videoRecorder.onstop = () => {
+                        let a = new Blob(e, {
+                          type: this.videoRecorder.mimeType
+                        });
+                        e.length = 0;
+                        let k = URL.createObjectURL(a),
+                          q = document.createElement("a");
+                        q.style.display = "none";
+                        q.setAttribute("download", "video.webm");
+                        q.setAttribute("href", k);
+                        document.body.appendChild(q);
+                        setTimeout(() => {
+                          URL.revokeObjectURL(k);
+                          document.body.removeChild(q);
+                        }, 100);
+                        q.click();
+                      };
+                      a.messages.push({
+                        text: "Recorder initiated and started!",
+                        status: 2,
+                        alpha: 0,
+                        time: Date.now()
+                      });
+                      this.videoRecorder.start();
+                    }
+                  else
+                    a.messages.push({
+                      text: "Media recorder not supported in this browser!",
+                      status: 2,
+                      alpha: 0,
+                      time: Date.now()
+                    });
+                  break;
+                case a.KEY_SCREENSHOT:
+                  var x = this.cv.toDataURL();
+                  k = atob(x.split(",")[1]);
+                  x = x
+                    .split(",")[0]
+                    .split(":")[1]
+                    .split(";")[0];
+                  let p = new Uint8Array(k.length);
+                  for (let a = 0; a < k.length; a++) p[a] = k.charCodeAt(a);
+                  let q = URL.createObjectURL(
+                      new Blob([p], {
+                        type: x
+                      })
+                    ),
+                    w = document.createElement("a");
+                  w.style.display = "none";
+                  w.setAttribute("download", "screenshot.png");
+                  w.setAttribute("href", q);
+                  document.body.appendChild(w);
+                  setTimeout(() => {
+                    URL.revokeObjectURL(q);
+                    document.body.removeChild(w);
+                  }, 100);
+                  w.click();
+              }
+              if (a.canUpgrade)
+                switch (e.keyCode) {
+                  case a.KEY_CHOOSE_1:
+                    this.talk("U", 0);
+                    break;
+                  case a.KEY_CHOOSE_2:
+                    this.talk("U", 1);
+                    break;
+                  case a.KEY_CHOOSE_3:
+                    this.talk("U", 2);
+                    break;
+                  case a.KEY_CHOOSE_4:
+                    this.talk("U", 3);
+                    break;
+                  case a.KEY_CHOOSE_5:
+                    this.talk("U", 4);
+                    break;
+                  case a.KEY_CHOOSE_6:
+                    this.talk("U", 5);
+                    break;
+                  case a.KEY_CHOOSE_7:
+                    this.talk("U", 6);
+                    break;
+                  case a.KEY_CHOOSE_8:
+                    this.talk("U", 7);
+                    break;
+                  case a.KEY_CHOOSE_9:
+                    this.talk("U", 8);
+                }
+            }
+          }
+        }
+        keyboardUp(e) {
+          switch (e.keyCode) {
+            case a.KEY_UP_ARROW:
+            case a.KEY_UP:
+              this.set(0, !1);
+              break;
+            case a.KEY_DOWN_ARROW:
+            case a.KEY_DOWN:
+              this.set(1, !1);
+              break;
+            case a.KEY_LEFT_ARROW:
+            case a.KEY_LEFT:
+              this.set(2, !1);
+              break;
+            case a.KEY_RIGHT_ARROW:
+            case a.KEY_RIGHT:
+              this.set(3, !1);
+              break;
+            case a.KEY_MOUSE_0:
+              this.set(4, !1);
+              break;
+            case a.KEY_MOUSE_1:
+              this.set(5, !1);
+              break;
+            case a.KEY_MOUSE_2:
+              this.set(6, !1);
+              break;
+            case a.KEY_UPGRADE_MAX:
+              this.statMaxing = !1;
+              break;
+            case a.KEY_PING:
+              a.showDebug = !1;
+              break;
+            case a.KEY_CLASS_TREE:
+              a.showTree = !1;
+          }
+        }
+        mouseDown(e) {
+          switch (e.button) {
+            case 0:
+              e = {
+                x: e.clientX,
+                y: e.clientY
+              };
+              let k = a.clickables.stat.check(e);
+              -1 !== k
+                ? this.talk("x", k)
+                : -1 !== a.clickables.skipUpgrades.check(e)
+                ? a.clearUpgrades()
+                : ((e = a.clickables.upgrade.check(e)),
+                  -1 !== e ? this.talk("U", e) : this.set(4, !0));
+              break;
+            case 1:
+              this.set(5, !0);
+              break;
+            case 2:
+              this.set(6, !0);
+          }
+        }
+        mouseMove(e) {
+          null !== a.player.x &&
+            this.setPosition(e.clientX - a.player.x, e.clientY - a.player.y);
+          a.statHover =
+            0 ===
+            a.clickables.hover.check({
+              x: e.clientX,
+              y: e.clientY
+            });
+        }
+        mouseUp(a) {
+          switch (a.button) {
+            case 0:
+              this.set(4, !1);
+              break;
+            case 1:
+              this.set(5, !1);
+              break;
+            case 2:
+              this.set(6, !1);
+          }
+        }
+        touchStart(e) {
+          e.preventDefault();
+          if (a.died && a.respawnOn <= Date.now())
+            this.spawn(a.playerName), (a.died = !1);
+          else {
+            for (let x of e.changedTouches) {
+              var k = {
+                x: x.clientX,
+                y: x.clientY
+              };
+              let e = x.identifier;
+              var p = a.clickables.stat.check(k);
+              -1 !== p
+                ? this.talk("x", p)
+                : -1 !== a.clickables.skipUpgrades.check(k)
+                ? a.clearUpgrades()
+                : ((p = a.clickables.upgrade.check(k)),
+                  -1 !== p
+                    ? this.talk("U", p)
+                    : ((k = k.x < this.cv.width / 2),
+                      null === this.movementTouch && k
+                        ? (this.movementTouch = e)
+                        : null !== this.controlTouch ||
+                          k ||
+                          ((this.controlTouch = e), this.set(4, !0))));
+            }
+            this.touchMove(e);
+          }
+        }
+        touchMove(a) {
+          a.preventDefault();
+          for (let k of a.changedTouches) {
+            var e = k.clientX;
+            a = k.clientY;
+            var p = k.identifier;
+            this.movementTouch === p
+              ? ((e -= (1 * this.cv.width) / 6),
+                (a -= (2 * this.cv.height) / 3),
+                (p = Math.sqrt(e * e + a * a)),
+                (e /= p),
+                (a /= p),
+                -0.3826834323650898 > a !== this.movementTop &&
+                  this.set(0, (this.movementTop = -0.3826834323650898 > a)),
+                0.3826834323650898 < a !== this.movementBottom &&
+                  this.set(1, (this.movementBottom = 0.3826834323650898 < a)),
+                -0.3826834323650898 > e !== this.movementLeft &&
+                  this.set(2, (this.movementLeft = -0.3826834323650898 > e)),
+                0.3826834323650898 < e !== this.movementRight &&
+                  this.set(3, (this.movementRight = 0.3826834323650898 < e)))
+              : this.controlTouch === p &&
+                this.setPosition(
+                  4 * (e - (5 * this.cv.width) / 6),
+                  4 * (a - (2 * this.cv.height) / 3)
+                );
+          }
+        }
+        touchEnd(a) {
+          a.preventDefault();
+          for (let e of a.changedTouches)
+            (a = e.identifier),
+              this.movementTouch === a
+                ? ((this.movementTouch = null),
+                  this.movementTop && this.set(0, (this.movementTop = !1)),
+                  this.movementBottom &&
+                    this.set(1, (this.movementBottom = !1)),
+                  this.movementLeft && this.set(2, (this.movementLeft = !1)),
+                  this.movementRight && this.set(3, (this.movementRight = !1)))
+                : this.controlTouch === a &&
+                  ((this.controlTouch = null), this.set(4, !1));
+        }
+      }
+      r.exports = E;
+    },
+    function(r, p) {
+      let w = new Uint32Array(1),
+        a = new Uint8Array(w.buffer),
+        e = new Float32Array(w.buffer),
+        E = new Uint16Array(1),
+        x = new Uint8Array(E.buffer);
+      p.encode = k => {
+        let p = [];
+        var r = [],
+          q = 0,
+          C = 15,
+          v = 0;
+        for (var t of k) {
+          var F = 0;
+          if (0 === t || !1 === t) F = 0;
+          else if (1 === t || !0 === t) F = 1;
+          else if ("number" === typeof t)
+            !Number.isInteger(t) || -4294967296 > t || 4294967296 <= t
+              ? ((F = 8), (q += 4))
+              : 0 <= t
+              ? 256 > t
+                ? ((F = 2), q++)
+                : 65536 > t
+                ? ((F = 4), (q += 2))
+                : 4294967296 > t && ((F = 6), (q += 4))
+              : -256 <= t
+              ? ((F = 3), q++)
+              : -65536 <= t
+              ? ((F = 5), (q += 2))
+              : -4294967296 <= t && ((F = 7), (q += 4));
+          else if ("string" === typeof t) {
+            F = !1;
+            for (let a = 0; a < t.length; a++)
+              if ("\u00ff" < t.charAt(a)) F = !0;
+              else if ("\x00" === t.charAt(a))
+                throw (console.error("Null containing string", t),
+                Error("Null containing string"));
+            !F && 1 >= t.length
+              ? ((F = 9), q++)
+              : F
+              ? ((F = 11), (q += 2 * t.length + 2))
+              : ((F = 10), (q += t.length + 1));
+          } else
+            throw (console.error("Unencodable data type", k),
+            Error("Unencodable data type"));
+          p.push(F);
+          if (F === C) v++;
+          else {
+            r.push(C);
+            if (1 <= v) {
+              for (; 19 < v; ) r.push(14), r.push(15), (v -= 19);
+              1 === v
+                ? r.push(C)
+                : 2 === v
+                ? r.push(12)
+                : 3 === v
+                ? r.push(13)
+                : 20 > v && (r.push(14), r.push(v - 4));
+            }
+            v = 0;
+            C = F;
+          }
+        }
+        r.push(C);
+        if (1 <= v) {
+          for (; 19 < v; ) r.push(14), r.push(15), (v -= 19);
+          1 === v
+            ? r.push(C)
+            : 2 === v
+            ? r.push(12)
+            : 3 === v
+            ? r.push(13)
+            : 20 > v && (r.push(14), r.push(v - 4));
+        }
+        r.push(15);
+        1 === r.length % 2 && r.push(15);
+        q = new Uint8Array((r.length >> 1) + q);
+        for (C = 0; C < r.length; C += 2) q[C >> 1] = (r[C] << 4) | r[C + 1];
+        r = r.length >> 1;
+        for (C = 0; C < p.length; C++)
+          switch (((v = k[C]), p[C])) {
+            case 2:
+            case 3:
+              q[r++] = v;
+              break;
+            case 4:
+            case 5:
+              E[0] = v;
+              q.set(x, r);
+              r += 2;
+              break;
+            case 6:
+            case 7:
+              w[0] = v;
+              q.set(a, r);
+              r += 4;
+              break;
+            case 8:
+              e[0] = v;
+              q.set(a, r);
+              r += 4;
+              break;
+            case 9:
+              v = 0 === v.length ? 0 : v.charCodeAt(0);
+              q[r++] = v;
+              break;
+            case 10:
+              for (t = 0; t < v.length; t++) q[r++] = v.charCodeAt(t);
+              q[r++] = 0;
+              break;
+            case 11:
+              for (t = 0; t < v.length; t++)
+                (F = v.charCodeAt(t)), (q[r++] = F & 255), (q[r++] = F >> 8);
+              q[r++] = 0;
+              q[r++] = 0;
+          }
+        return q;
+      };
+      p.decode = k => {
+        k = new Uint8Array(k);
+        if (15 !== k[0] >> 4) return null;
+        var p = [],
+          r = 15;
+        let q = 0;
+        for (var C = !0; ; ) {
+          if (q >= k.length) return null;
+          var v = k[q];
+          C ? ((v &= 15), q++) : (v >>= 4);
+          C = !C;
+          if (12 === (v & 12)) {
+            if (15 === v) {
+              C && q++;
+              break;
+            }
+            let a = v - 10;
+            if (14 === v) {
+              if (q >= k.length) return null;
+              v = k[q];
+              C ? ((v &= 15), q++) : (v >>= 4);
+              C = !C;
+              a += v;
+            }
+            for (v = 0; v < a; v++) p.push(r);
+          } else p.push(v), (r = v);
+        }
+        r = [];
+        for (let t of p)
+          switch (t) {
+            case 0:
+              r.push(0);
+              break;
+            case 1:
+              r.push(1);
+              break;
+            case 2:
+              r.push(k[q++]);
+              break;
+            case 3:
+              r.push(k[q++] - 256);
+              break;
+            case 4:
+              x[0] = k[q++];
+              x[1] = k[q++];
+              r.push(E[0]);
+              break;
+            case 5:
+              x[0] = k[q++];
+              x[1] = k[q++];
+              r.push(E[0] - 65536);
+              break;
+            case 6:
+              a[0] = k[q++];
+              a[1] = k[q++];
+              a[2] = k[q++];
+              a[3] = k[q++];
+              r.push(w[0]);
+              break;
+            case 7:
+              a[0] = k[q++];
+              a[1] = k[q++];
+              a[2] = k[q++];
+              a[3] = k[q++];
+              r.push(w[0] - 4294967296);
+              break;
+            case 8:
+              a[0] = k[q++];
+              a[1] = k[q++];
+              a[2] = k[q++];
+              a[3] = k[q++];
+              r.push(Number.isNaN(e[0]) ? -1 : e[0]);
+              break;
+            case 9:
+              p = k[q++];
+              r.push(0 === p ? "" : String.fromCharCode(p));
+              break;
+            case 10:
+              for (p = ""; (C = k[q++]); ) p += String.fromCharCode(C);
+              r.push(p);
+              break;
+            case 11:
+              for (p = ""; (C = k[q++] | (k[q++] << 8)); )
+                p += String.fromCharCode(C);
+              r.push(p);
+          }
+        return r;
+      };
+    },
+    function(r) {
+       r.exports = {
+        normal: {
+          teal: "#7ADBBC",
+          lgreen: "#B9E87E",
+          orange: "#E7896D",
+          yellow: "#FDF380",
+          lavender: "#B58EFD",
+          pink: "#EF99C3",
+          vlgrey: "#E8EBF7",
+          lgrey: "#AA9F9E",
+          guiwhite: "#FFFFFF",
+          black: "#484848",
+          blue: "#3CA4CB",
+          green: "#8ABC3F",
+          red: "#E03E41",
+          gold: "#EFC74B",
+          purple: "#8D6ADF",
+          magenta: "#CC669C",
+          grey: "#A7A7AF",
+          dgrey: "#726F6F",
+          white: "#DBDBDB",
+          guiblack: "#000000",
+          paletteSize: 10,
+          border: 0.65
+        },
+        classic: {
+          teal: "#8EFFFB",
+          lgreen: "#85E37D",
+          orange: "#FC7676",
+          yellow: "#FFEB8E",
+          lavender: "#B58EFF",
+          pink: "#F177DD",
+          vlgrey: "#CDCDCD",
+          lgrey: "#999999",
+          guiwhite: "#FFFFFF",
+          black: "#525252",
+          blue: "#00B0E1",
+          green: "#00E06C",
+          red: "#F04F54",
+          gold: "#FFE46B",
+          purple: "#768CFC",
+          magenta: "#BE7FF5",
+          grey: "#999999",
+          dgrey: "#545454",
+          white: "#C0C0C0",
+          guiblack: "#000000",
+          paletteSize: 10,
+          border: 0.5
+        },
+        dark: {
+          teal: "#8975B7",
+          lgreen: "#0C491D",
+          orange: "#C46748",
+          yellow: "#B2B224",
+          lavender: "#7D56C5",
+          pink: "#B24FAE",
+          vlgrey: "#1E1E1E",
+          lgrey: "#3C3A3A",
+          guiwhite: "#000000",
+          black: "#E5E5E5",
+          blue: "#379FC6",
+          green: "#30B53B",
+          red: "#FF6C6E",
+          gold: "#FFC665",
+          purple: "#9673E8",
+          magenta: "#C8679B",
+          grey: "#635F5F",
+          dgrey: "#73747A",
+          white: "#11110F",
+          guiblack: "#FFFFFF",
+          paletteSize: 10,
+          border: 0.15
+        },
+        natural: {
+          teal: "#76C1BB",
+          lgreen: "#AAD35D",
+          orange: "#E09545",
+          yellow: "#FFD993",
+          lavender: "#939FFF",
+          pink: "#D87FB2",
+          vlgrey: "#C4B6B6",
+          lgrey: "#7F7F7F",
+          guiwhite: "#FFFFFF",
+          black: "#373834",
+          blue: "#4F93B5",
+          green: "#00B659",
+          red: "#E14F65",
+          gold: "#E5BF42",
+          purple: "#8053A0",
+          magenta: "#B67CAA",
+          grey: "#998F8F",
+          dgrey: "#494954",
+          white: "#A5B2A5",
+          guiblack: "#000000",
+          paletteSize: 10,
+          border: 0.2
+        },
+        pumpkin: {
+          teal: "#721970",
+          lgreen: "#ff6347",
+          orange: "#1b713a",
+          yellow: "#fdf380",
+          lavender: "#941100",
+          pink: "#194417",
+          vlgrey: "#1b713a",
+          lgrey: "#aa9f9e",
+          guiwhite: "#fed8b1",
+          black: "#484848",
+          blue: "#3ca4cb",
+          green: "#76EEC6",
+          red: "#F04F54",
+          gold: "#1b713a",
+          purple: "#1b713a",
+          magenta: "#cc669c",
+          grey: "#ffffff",
+          dgrey: "#726f6f",
+          white: "#ff9b58",
+          guiblack: "#000000",
+          paletteSize: 10,
+          border: 3.3
+        },
+        forest: {
+          teal: "#884AA5",
+          lgreen: "#8C9B3E",
+          orange: "#D16A80",
+          yellow: "#97596D",
+          lavender: "#499855",
+          pink: "#60294F",
+          vlgrey: "#DDC6B8",
+          lgrey: "#7E949E",
+          guiwhite: "#FFFFE8",
+          black: "#665750",
+          blue: "#807BB6",
+          green: "#A1BE55",
+          red: "#E5B05B",
+          gold: "#FF4747",
+          purple: "#BAC674",
+          magenta: "#BA78D1",
+          grey: "#998866",
+          dgrey: "#529758",
+          white: "#7DA060",
+          guiblack: "#000000",
+          paletteSize: 10,
+          border: 0.7
+        },
+        midnight: {
+          teal: "#2B9098",
+          lgreen: "#4BAA5D",
+          orange: "#345678",
+          yellow: "#CDC684",
+          lavender: "#89778E",
+          pink: "#A85C90",
+          vlgrey: "#CCCCCC",
+          lgrey: "#A7B2B7",
+          guiwhite: "#BAC6FF",
+          black: "#091F28",
+          blue: "#123455",
+          green: "#098765",
+          red: "#000013",
+          gold: "#566381",
+          purple: "#743784",
+          magenta: "#B29098",
+          grey: "#555555",
+          dgrey: "#649EB7",
+          white: "#444444",
+          guiblack: "#000000",
+          paletteSize: 10,
+          border: 0.6
+        },
+        pastel: {
+          teal: "#89BFBA",
+          lgreen: "#B5D17D",
+          orange: "#E5E0E0",
+          yellow: "#B5BBE5",
+          lavender: "#939FFF",
+          pink: "#646DE5",
+          vlgrey: "#B2B2B2",
+          lgrey: "#7F7F7F",
+          guiwhite: "#FFFFFF",
+          black: "#383835",
+          blue: "#AEAEFF",
+          green: "#AEFFAE",
+          red: "#FFAEAE",
+          gold: "#FFFFFF",
+          purple: "#C3C3D8",
+          magenta: "#FFB5FF",
+          grey: "#CCCCCC",
+          dgrey: "#A0A0B2",
+          white: "#F2F2F2",
+          guiblack: "#000000",
+          paletteSize: 10,
+          border: 0.35
+        },
+        space: {
+          teal: "#4788F3",
+          lgreen: "#AF1010",
+          orange: "#FF0000",
+          yellow: "#82F850",
+          lavender: "#FFFFFF",
+          pink: "#57006C",
+          vlgrey: "#FFFFFF",
+          lgrey: "#272727",
+          guiwhite: "#000000",
+          black: "#7F7F7F",
+          blue: "#0E1B92",
+          green: "#0AEB80",
+          red: "#C2B90A",
+          gold: "#3E7E8C",
+          purple: "#285911",
+          magenta: "#A9707E",
+          grey: "#6F6A68",
+          dgrey: "#2D0738",
+          white: "#000000",
+          guiblack: "#FFFFFF",
+          paletteSize: 10,
+          border: 0.25
+        },
+        nebula: {
+          teal: "#38B06E",
+          lgreen: "#22882E",
+          orange: "#D28E7F",
+          yellow: "#D5D879",
+          lavender: "#E084EB",
+          pink: "#DF3E3E",
+          vlgrey: "#F0F2CC",
+          lgrey: "#7D7D7D",
+          guiwhite: "#C2C5EF",
+          black: "#161616",
+          blue: "#9274E6",
+          green: "#89F470",
+          red: "#E08E5D",
+          gold: "#ECDC58",
+          purple: "#58CBEC",
+          magenta: "#EA58EC",
+          grey: "#7E5713",
+          dgrey: "#303030",
+          white: "#555555",
+          guiblack: "#EAEAEA",
+          paletteSize: 10,
+          border: 0.5
+        },
+        bleach: {
+          teal: "#00FFFF",
+          lgreen: "#00FF00",
+          orange: "#FF3200",
+          yellow: "#FFEC00",
+          lavender: "#FF24A7",
+          pink: "#FF3CBD",
+          vlgrey: "#FFF186",
+          lgrey: "#918181",
+          guiwhite: "#F1F1F1",
+          black: "#5F5F5F",
+          blue: "#0025FF",
+          green: "#00FF00",
+          red: "#FF0000",
+          gold: "#FFFA23",
+          purple: "#3100FF",
+          magenta: "#D4D3D3",
+          grey: "#838383",
+          dgrey: "#4C4C4C",
+          white: "#FFFEFE",
+          guiblack: "#080808",
+          paletteSize: 10,
+          border: 0.4
+        },
+        ocean: {
+          teal: "#76EEC6",
+          lgreen: "#41AA78",
+          orange: "#FF7F50",
+          yellow: "#FFD250",
+          lavender: "#DC3388",
+          pink: "#FA8072",
+          vlgrey: "#8B8886",
+          lgrey: "#BFC1C2",
+          guiwhite: "#FFFFFF",
+          black: "#12466B",
+          blue: "#4200AE",
+          green: "#0D6338",
+          red: "#DC4333",
+          gold: "#FEA904",
+          purple: "#7B4BAB",
+          magenta: "#5C246E",
+          grey: "#656884",
+          dgrey: "#D4D7D9",
+          white: "#3283BC",
+          guiblack: "#000000",
+          paletteSize: 10,
+          border: 0.3
+        },
+        badlands: {
+          teal: "#F9CB9C",
+          lgreen: "#F1C232",
+          orange: "#38761D",
+          yellow: "#E69138",
+          lavender: "#B7B7B7",
+          pink: "#78866B",
+          vlgrey: "#6AA84F",
+          lgrey: "#B7B7B7",
+          guiwhite: "#A4C2F4",
+          black: "#000000",
+          blue: "#0C5A9E",
+          green: "#6E8922",
+          red: "#5B0000",
+          gold: "#783F04",
+          purple: "#591C77",
+          magenta: "#20124D",
+          grey: "#2F1C16",
+          dgrey: "#999999",
+          white: "#543517",
+          guiblack: "#CFE2F3",
+          paletteSize: 10,
+          border: 0.4
+        },
+        custom: {
+          teal: "#7ADBBC",
+          lgreen: "#B9E87E",
+          orange: "#E7896D",
+          yellow: "#FDF380",
+          lavender: "#B58EFD",
+          pink: "#EF99C3",
+          vlgrey: "#E8EBF7",
+          lgrey: "#AA9F9E",
+          guiwhite: "#FFFFFF",
+          black: "#484848",
+          blue: "#3CA4CB",
+          green: "#8ABC3F",
+          red: "#E03E41",
+          gold: "#EFC74B",
+          purple: "#8D6ADF",
+          magenta: "#CC669C",
+          grey: "#A7A7AF",
+          dgrey: "#726F6F",
+          white: "#DBDBDB",
+          guiblack: "#000000",
+          paletteSize: 10,
+          border: 0.65
+        }
+      };
+    }
+  ]);
+   );
                       this.videoRecorder.ondataavailable = a => e.push(a.data);
                       this.videoRecorder.onstop = () => {
                         let a = new Blob(e, {
